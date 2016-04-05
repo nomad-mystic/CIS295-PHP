@@ -21,6 +21,7 @@ redirectHTTPS();
      <title>Document</title>
 </head>
 <body>
+
      <p><?php echo $_SERVER['HTTP_HOST']; ?></p>
      <p><?php echo $_SERVER['REQUEST_URI']; ?></p>
      <p><?php echo 'Hello World'; ?></p>
