@@ -14,7 +14,7 @@ header('Content-Type: text/javascript');
 
 $(function() {
 
-     var show_button = $('#show_button').button();
+     var show_button = $('#show_dialog_button').button();
      show_button.on('click', function() {
                $('#calculator').dialog({
                     width: 600,
@@ -25,7 +25,6 @@ $(function() {
                               $.post('assets/actions/do_calculate.php',
                               $('#input_fields').serialize(),
                               function(data) {
-
                                    $('#<?php echo OUT_VOLTS_KEY; ?>').val(data.volts);
                                    $('#<?php echo OUT_OHMS_KEY; ?>').val(data.ohms);
                                    $('#<?php echo OUT_AMPS_KEY; ?>').val(data.amps);
