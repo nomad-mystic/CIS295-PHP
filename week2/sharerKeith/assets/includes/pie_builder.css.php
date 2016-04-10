@@ -9,5 +9,26 @@
 header('Content-Type: text/css');
  ?>
 
+fieldset {
+     padding: 20px;
+}
+fieldset input {
+     display: block;
+     margin-bottom: 12px;
+}
 
+#pie_chart_dialog {
+     display: none;
+}
 
+.ui-dialog-titlebar-close {
+     display: none;
+}
+
+#chart_output {
+     float: right;
+}
+
+#chart_inputs {
+     float: left;
+}

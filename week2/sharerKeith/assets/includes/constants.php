@@ -6,10 +6,12 @@
  * Time: 2:36 PM
  */
 
-const VOLTS_KEY = 'volts';
-const OHMS_KEY = 'ohms';
+// Form constants
+const NUMBER_OF_SLICES = 'number_of_slices';
+const SLICE_NUMBER_VAL = 'slice_number_val';
+const SLICE_COLOR = 'slice_color';
+const SLICE_HIGHLIGHT_COLOR = 'slice_highlight_color';
+const SLICE_LABEL = 'slice_label';
 
-const OUT_VOLTS_KEY = 'out_volts';
-const OUT_OHMS_KEY = 'out_ohms';
-const OUT_AMPS_KEY = 'out_amps';
-const OUT_WATTS_KEY = 'out_watts';
+const CHART_INPUTS = 'chart_inputs';
+const CHART_OUTPUT = 'chart_output';

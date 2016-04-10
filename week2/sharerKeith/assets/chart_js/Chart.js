@@ -2598,7 +2598,7 @@
 		//Providing a defaults will also register the defaults in the chart namespace
 		defaults : defaultConfig,
 		//Initialize is fired when the chart is initialized - Data is passed in as a parameter
-		//Config is automatically merged by the core of Chart.js, and is available at this.options
+		//Config is automatically merged by the core of chart_js, and is available at this.options
 		initialize:  function(data){
 
 			//Declare segments as a static property to prevent inheriting across the Chart type prototype
@@ -3192,7 +3192,7 @@
 		//Providing a defaults will also register the defaults in the chart namespace
 		defaults : defaultConfig,
 		//Initialize is fired when the chart is initialized - Data is passed in as a parameter
-		//Config is automatically merged by the core of Chart.js, and is available at this.options
+		//Config is automatically merged by the core of chart_js, and is available at this.options
 		initialize:  function(data){
 			this.segments = [];
 			//Declare segment class as a chart instance specific class, so it can share props for this instance
