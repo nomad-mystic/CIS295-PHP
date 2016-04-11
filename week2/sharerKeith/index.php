@@ -31,27 +31,23 @@ require_once('assets/includes/constants.php');
 <body>
 <div id="show_dialog_button">Create Chart</div>
 <section id="pie_chart_dialog" title="Pie Chart Builder">
-    <fieldset id="<?php echo CHART_INPUTS; ?>">
-         <legend>Create Your Chart:</legend>
-         <label for="<?php echo NUMBER_OF_SLICES; ?>">Number of Slices?</label>
-         <input type="number" name="<?php echo NUMBER_OF_SLICES; ?>" min="1" max="4" id="<?php echo NUMBER_OF_SLICES; ?>">
-
-         <!--get values for slices-->
-         <!--Slice One-->
-         <label for="<?php echo SLICE_NUMBER_VAL; ?>_1">Enter the Value of the Slice:</label>
-         <input type="number" name="<?php echo SLICE_NUMBER_VAL; ?>[]">
-
-         <label for="<?php echo SLICE_COLOR; ?>">Slice Color</label>
-         <input type="color" name="<?PHP echo SLICE_COLOR; ?>">
-
-
-         <!--Slice Two-->
-         <label for="<?php echo SLICE_NUMBER_VAL; ?>_2">Enter the Value of the Slice:</label>
-         <input type="number" name="<?php echo SLICE_NUMBER_VAL; ?>[]">
-    </fieldset>
-    <section>
-        <canvas id="<?php echo CHART_OUTPUT; ?>" width="300px" height="300px"></canvas>
-    </section>
-</section>
+     <section>
+          <fieldset id="<?php echo CHART_INPUTS; ?>">
+               <legend>Create Your Chart:</legend>
+               <label for="<?php echo NUMBER_OF_SLICES; ?>">Number of Slices?</label>
+               <input type="number" name="<?php echo NUMBER_OF_SLICES; ?>" min="1" max="4" id="<?php echo NUMBER_OF_SLICES; ?>">
+               <!--Input Fields Added by Javascript-->
+               <article class="input_fields"></article>
+          </fieldset>
+     </section>
+     <section id="canvas_parent">
+         <canvas id="<?php echo CHART_OUTPUT; ?>" width="350px" height="350px"></canvas>
+     </section>
+</section><!--end pie_chart_dialog-->
+<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad architecto autem, commodi dolor doloremque doloribus ducimus
+     harum nesciunt perferendis perspiciatis praesentium veniam voluptates! Aut
+     doloribus dolorum eius nemo quasi, quos?
+</div>
 </body>
 </html>

@@ -8,30 +8,59 @@
 
 require_once('../includes/constants.php');
 
-// POST values
-$number_of_slices = $_POST['number_of_slices'];
-$slice_val = $_POST['slice_number_val'];
-$slice_color = $_POST['slice_color'];
-$slice_highlight = 'rgba(0, 0, 0, .1)';
+function processPOST()
+{
+     // POST values
+     $number_of_slices = $_GET['number_of_slices'];
+     $slice_val = $_GET['slice_number_val'];
+     $slice_color = $_GET['slice_color'];
+     $slice_highlight = $slice_color;
+     $slice_label = $_GET['slice_label'];
 
-// Create generic object
-$slice_object = new stdClass();
+     // Create generic object
+     $slice_object = new stdClass();
 
-// Simple validation
-$error_message = 'Please start over';
-if ($slice_val == 0) {
-     echo json_encode($error_message);
-     exit;
+
+
+     // function adapted from http://stackoverflow.com/questions/3512311/how-to-generate-lighter-darker-color-with-php
+     function adjustBrightness($hex, $steps) {
+          // Steps should be between -255 and 255. Negative = darker, positive = lighter
+          $steps = max(-255, min(255, $steps));
+
+          // Normalize into a six character long hex string
+          $hex = str_replace('#', '', $hex);
+          if (strlen($hex) == 3) {
+               $hex = str_repeat(substr($hex, 0, 1), 2).str_repeat(substr($hex, 1, 1), 2).str_repeat(substr($hex, 2, 1), 2);
+          }
+
+          // Split into three parts: R, G and B
+          $color_parts = str_split($hex, 2);
+          $return = '#';
+
+          foreach ($color_parts as $color) {
+               $color   = hexdec($color); // Convert to decimal
+               $color   = max(0,min(255,$color + $steps)); // Adjust color
+               $return .= str_pad(dechex($color), 2, '0', STR_PAD_LEFT); // Make two char hex code
+          }
+
+          return $return;
+     }
+
+     for ($i = 0; $i < $number_of_slices; $i++) {
+          $computed_highlight = adjustBrightness($slice_highlight[$i], 50);
+          $slice_object->slice_highlight[$i] = $computed_highlight;
+     }
+
+     // Objects
+     $slice_object->slice_val = $slice_val;
+     $slice_object->slice_color = $slice_color;
+     $slice_object->slice_label = $slice_label;
+     $slice_object->number_of_slices = $number_of_slices;
+
+     return $slice_object;
 }
 
-for ($i = 0; $i < $number_of_slices; $i++) {
-     $slice_object->slice_highlight_[$i] = $slice_highlight;
-}
-
-// Objects
-$slice_object->slice_val = $slice_val;
-$slice_object->slice_color = $slice_color;
-$slice_object->number_of_slices = $number_of_slices;
-
-
+// Calling processing function and returning object with user inputs
+$slice_object = processPOST();
+// Echoing for AJAX retrieval
 echo json_encode($slice_object);
