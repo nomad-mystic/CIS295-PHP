@@ -25,10 +25,6 @@ fieldset input {
      display: none;
 }
 
-#chart_output {
-     float: right;
-}
-
 #chart_inputs {
      float: left;
 }
