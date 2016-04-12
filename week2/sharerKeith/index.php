@@ -22,7 +22,7 @@ require_once('assets/includes/constants.php');
     <link rel="stylesheet" href="assets/jquery-ui/overcast/jquery-ui.min.css">
     <link rel="stylesheet" href="assets/jquery-ui/overcast/theme.css">
 	<link rel="stylesheet" href="assets/bootstrap/dist/css/bootstrap.min.css">
-
+	<link rel="stylesheet" href="assets/flatUI/dist/css/flat-ui.min.css">
     <!--my scripts and styles-->
     <script src="assets/includes/pie_builder.js.php"></script>
     <link rel="stylesheet" href="assets/includes/pie_builder.css.php">
@@ -33,12 +33,15 @@ require_once('assets/includes/constants.php');
 <section id="pie_chart_dialog" title="Pie Chart Builder">
 	<div class="container-fluid">
 		<div class="row">
-			<section>
+			<section class="user-form">
 				<div class="col-sm-4">
 					<fieldset id="<?php echo CHART_INPUTS; ?>">
 						<legend>Create Your Chart:</legend>
-						<label for="<?php echo NUMBER_OF_SLICES; ?>">Number of Slices?</label>
-						<input type="number" name="<?php echo NUMBER_OF_SLICES; ?>" min="1" max="4" id="<?php echo NUMBER_OF_SLICES; ?>">
+						<div class="form-group">
+							<label for="<?php echo NUMBER_OF_SLICES; ?>" class="label">Number of Slices?</label>
+							<input type="number" name="<?php echo NUMBER_OF_SLICES; ?>" min="1" max="4"
+							       id="<?php echo NUMBER_OF_SLICES; ?>" class="form-control">
+						</div>
 						<!--Input Fields Added by Javascript-->
 						<article class="input_fields"></article>
 					</fieldset>

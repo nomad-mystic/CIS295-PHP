@@ -83,19 +83,19 @@ $(function() {
 		var user_input_val = number_of_slices.val();
 		var i;
 		var input_fields_HTML = '';
-		input_fields_HTML += '<label for="<?php echo CHART_TITLE; ?>">Enter the Title of Your Chart</label>';
-		input_fields_HTML += '<input type="text" name="<?php echo CHART_TITLE; ?>">';
+		input_fields_HTML += '<label for="<?php echo CHART_TITLE; ?>" class="label">Enter the Title of Your Chart</label>';
+		input_fields_HTML += '<input type="text" name="<?php echo CHART_TITLE; ?>" class="form-control">';
 
 		for (i = 0; i < user_input_val; i++) {
 			var label_number = i + 1;
-			input_fields_HTML += '<label for="<?php echo SLICE_NUMBER_VAL; ?>">Enter the Value of the Slice:' + label_number + '</label>';
-			input_fields_HTML += '<input type="number" name="<?php echo SLICE_NUMBER_VAL; ?>[]" min="0" max="1000">';
+			input_fields_HTML += '<label for="<?php echo SLICE_NUMBER_VAL; ?>" class="label">Enter the Value of the Slice:' + label_number + '</label>';
+			input_fields_HTML += '<input type="number" name="<?php echo SLICE_NUMBER_VAL; ?>[]" min="0" max="1000" class="form-control">';
 
-			input_fields_HTML += '<label for="<?php echo SLICE_COLOR; ?>">Slice Color: ' + label_number + '</label>';
-			input_fields_HTML += '<input type="color" name="<?PHP echo SLICE_COLOR; ?>[]">';
+			input_fields_HTML += '<label for="<?php echo SLICE_COLOR; ?>" class="label">Slice Color: ' + label_number + '</label>';
+			input_fields_HTML += '<input type="color" name="<?PHP echo SLICE_COLOR; ?>[]" class="form-control">';
 
-			input_fields_HTML += '<label for="<?php echo SLICE_LABEL; ?>">Give Your Chart a Label: ' + label_number + '</label>';
-			input_fields_HTML += '<input type="text" name="<?php echo SLICE_LABEL; ?>[]">';
+			input_fields_HTML += '<label for="<?php echo SLICE_LABEL; ?>" class="label">Give Your Chart a Label: ' + label_number + '</label>';
+			input_fields_HTML += '<input type="text" name="<?php echo SLICE_LABEL; ?>[]" class="form-control">';
 
 		}
 		$('.input_fields').html(input_fields_HTML);

@@ -16,7 +16,23 @@ fieldset input {
      display: block;
      margin-bottom: 12px;
 }
-
+legend {
+	margin-bottom: 0;
+}
+.form-control {
+	margin-bottom: 0;
+	height: 30px;
+	padding: 6px 12px;
+}
+.form-group {
+	margin-bottom: 0;
+}
+.ui-widget input {
+	font-size: 12px;
+}
+.chart_title {
+	text-align: center;
+}
 #pie_chart_dialog {
      display: none;
 }
