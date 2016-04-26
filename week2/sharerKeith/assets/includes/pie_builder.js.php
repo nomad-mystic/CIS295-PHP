@@ -10,7 +10,7 @@ require_once('constants.php');
 header('Content-Type: text/javascript');
 
 ?>
-
+// jQuery Closure
 $(function() {
 	// Click event to show dialog widget and
 	// uses AJAX to call pie_chart_builder.php which echos a JSON object for Chart.js
@@ -24,9 +24,8 @@ $(function() {
 					if ($("#<?php echo NUMBER_OF_SLICES; ?>").val() !== 0) {
 						$.post('assets/actions/pie_chart_builder.php', $("#<?php echo CHART_INPUTS; ?>").serialize(),
 							function(data) {
-								console.log(data);
-								var parsed_chart = jQuery.parseJSON(data);
-								build_chart(parsed_chart);
+//								var parsed_chart = jQuery.parseJSON(data);
+								build_chart(data);
 							});
                          }
                     },
@@ -41,15 +40,19 @@ $(function() {
 	{
 		var i;
 		var data = [];
-		
+
 		// Counter Closure
 		var add = (function() 
 		{
 			var counter = 0;
-			return function() {return counter += 1};
-		})();
+			return function()
+			{
+				return counter += 1
+			};
+		});
 		var counter = add();
-		
+
+		// Building Chart slice objects
 		for (i = 0; i < chart_data.number_of_slices; i++) {
 			var slice = {
 				value: Number(chart_data.slice_val[i]),
@@ -83,11 +86,13 @@ $(function() {
 		var user_input_val = number_of_slices.val();
 		var i;
 		var input_fields_HTML = '';
+
 		input_fields_HTML += '<label for="<?php echo CHART_TITLE; ?>" class="label">Enter the Title of Your Chart</label>';
 		input_fields_HTML += '<input type="text" name="<?php echo CHART_TITLE; ?>" class="form-control">';
 
 		for (i = 0; i < user_input_val; i++) {
 			var label_number = i + 1;
+
 			input_fields_HTML += '<label for="<?php echo SLICE_NUMBER_VAL; ?>" class="label">Enter the Value of the Slice:' + label_number + '</label>';
 			input_fields_HTML += '<input type="number" name="<?php echo SLICE_NUMBER_VAL; ?>[]" min="0" max="1000" class="form-control">';
 
@@ -96,7 +101,6 @@ $(function() {
 
 			input_fields_HTML += '<label for="<?php echo SLICE_LABEL; ?>" class="label">Give Your Chart a Label: ' + label_number + '</label>';
 			input_fields_HTML += '<input type="text" name="<?php echo SLICE_LABEL; ?>[]" class="form-control">';
-
 		}
 		$('.input_fields').html(input_fields_HTML);
 	}); // number_of_slices

@@ -7,8 +7,11 @@
  */
 
 require_once('../includes/constants.php');
+header('Content-Type: application/json');
 
-function processPOST() {
+
+function processPOST()
+{
 	// POST values
 	$number_of_slices = $_POST[NUMBER_OF_SLICES];
 	$slice_val        = $_POST[SLICE_NUMBER_VAL];
@@ -21,7 +24,8 @@ function processPOST() {
 	$slice_object = new stdClass();
 
 	// function adapted from http://stackoverflow.com/questions/3512311/how-to-generate-lighter-darker-color-with-php
-	function adjustBrightness($hex, $steps) {
+	function adjustBrightness($hex, $steps)
+	{
 
 		// Steps should be between -255 and 255. Negative = darker, positive = lighter
 		$steps = max(-255, min(255, $steps));
@@ -44,13 +48,14 @@ function processPOST() {
 
 		return $tint;
 	} // End adjustBrightness()
-
+	
+	
 	for ($i = 0; $i < $number_of_slices; $i++) {
 		$computed_highlight = adjustBrightness($slice_highlight[$i], 50);
 		$slice_object->slice_highlight[$i] = $computed_highlight;
 	}
 
-	// Objects
+	// Build Object
 	$slice_object->slice_val = $slice_val;
 	$slice_object->slice_color = $slice_color;
 	$slice_object->slice_label = $slice_label;
