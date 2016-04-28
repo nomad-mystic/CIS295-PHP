@@ -8,7 +8,6 @@
 // PEAR Mail extension
 require_once('Mail.php');
 
-
 class SharerEmail
 {
     // Class Constants
