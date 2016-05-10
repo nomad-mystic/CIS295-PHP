@@ -29,10 +29,12 @@ function login() {
             'Login': function() 
             {
                 var cookies = document.cookie.split('; ');
+                console.log(cookies);
                 var sess_id = '';
                 for (var i=0; i < cookies.length; i++) { 
                     if( cookies[i].indexOf('PHPSESSID=') == 0) { 
                         sess_id = cookies[i].substr(cookies[i].indexOf('=') + 1); 
+                        console.log(sess_id);
                     } 
                 } // end cookies 
                 
