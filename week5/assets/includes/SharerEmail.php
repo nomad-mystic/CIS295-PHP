@@ -14,7 +14,7 @@ class SharerEmail
     const HOST = 'ssl://smtp.gmail.com';
     const PORT = '465';
     const USERNAME = 'keith.murphy1@pcc.edu';
-    const PASSWORD = '2Changeme031987';
+    const PASSWORD = '';
     const FROM = 'Generic Sharer <sharer@sharer.com>';
 
     // Local Variables
