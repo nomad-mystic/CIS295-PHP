@@ -6,9 +6,8 @@
  * Time: 5:20 PM
  */
 
-require_once('../includes/sharer_globals.php');
+require_once('../includes/User.php');
 
 session_start();
-if (isset($_SESSION[USERNAME_KEY])) {
-    echo $_SESSION[USERNAME_KEY];
-}
+
+echo User::getUser();

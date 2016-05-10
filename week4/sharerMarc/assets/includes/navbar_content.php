@@ -13,28 +13,41 @@ $(function() {
     $('#login_button').on('click', function() {
         loadContent('assets/includes/login_content.php', function() {
             login();
+            updateNavbar();
         });
     }); // end login_button
     
     $('#register_button').on('click', function() {
         loadContent('assets/includes/register_content.php', function() {
             register();
+            updateNavbar();
         });
     }); // end login_button
+    
+    $('#logout_button').on('click', function() {
+        $.get('assets/actions/do_logout.php', function() {
+            updateNavbar();
+        });
+    }); // end logout function 
+    
+    // Init the navbar 
+    updateNavbar();
+    
 }); // end Ready 
 function updateNavbar() {
     $.get('assets/actions/get_username.php', function(user) {
-        if (user === '') {
-            $('#login_button').show();
-            $('#register_button').show();
-            $('#username').text('').hide();
-            $('#logout_button').hide();
+        if (user == '') {
+            $('#login_button span').removeClass('hidden');
+            $('#register_button span').removeClass('hidden');
+            $('#username span').text('').addClass('hidden');
+            $('#logout_button span').addClass('hidden');
         } else {
-            $('#login_button').hide();
-            $('#register_button').hide();
-            $('#username').text(user).show();
-            $('#logout_button').show();
+            $('#login_button span').addClass('hidden');
+            $('#register_button span').addClass('hidden');
+            $('#username span').text(user).removeClass('hidden');
+            $('#logout_button span').removeClass('hidden');
         }
+        
     });  
 };
 JS;
@@ -43,19 +56,19 @@ $html = <<<HTML
 <nav>
     <ul class="toolbar">
         <li class="tool_item_left">
-            <span class="tool_item_label">Generic Sharer</span>
+            <span class="tool_item_label ">Generic Sharer</span>
         </li>
         <li class="tool_item_right clickable" id="login_button">
-            <span class="tool_item_label">Sign In</span>
+            <span class="tool_item_label hidden">Sign In</span>
         </li>
         <li class="tool_item_right clickable" id="register_button">
-            <span class="tool_item_label">Sign Up</span>
+            <span class="tool_item_label hidden">Sign Up</span>
         </li>
-        <li class="tool_item_right clickable">
-            <span class="tool_item_label" id="logout_button">Log Out</span>
+        <li class="tool_item_right clickable" id="logout_button">
+            <span class="tool_item_label hidden">Log Out</span>
         </li>
-        <li class="tool_item_right">
-            <span class="tool_item_label" id="username"></span>
+        <li class="tool_item_right" id="username">
+            <span class="tool_item_label hidden"></span>
         </li>
     </ul>
 </nav>
@@ -89,6 +102,9 @@ $css = <<<CSS
     background: #000;
     cursor: pointer;
 }       
+.hidden {
+    display: none;
+}
 CSS;
 
 $object = new LoadableContent($js, $html, $css);

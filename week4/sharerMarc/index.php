@@ -6,8 +6,6 @@
  * Time: 10:02 PM
  */
 
-require_once('assets/includes/calculator_constants.php');
-
 ?>
 
 <!doctype html>
