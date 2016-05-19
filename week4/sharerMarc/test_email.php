@@ -6,7 +6,7 @@
  * Time: 1:36 AM
  */
 
-require_once('assets/includes/SharerEmail.php');
+require_once('assets/includes/SharerEmail_week4.php');
 
 $email = new SharerEmail(
             'keith.murphy1@pcc.edu',

@@ -5,44 +5,31 @@
  * Date: 4/7/2016
  * Time: 10:02 PM
  */
-require_once('assets/includes/sharer_constants.php');
-require_once('assets/includes/User.php');
-require_once('assets/includes/SharerDatabase.php');
-require_once('assets/includes/SharerEmail.php');
+
+require_once('assets/includes/common_requires.php');
 ?>
 
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>User Login and Register</title>
-
-    <!--jquery jquery-ui-->
-    <script src="assets/jquery/jquery.min.js"></script>
-    <script src="assets/jquery-ui/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="assets/jquery-ui/overcast/jquery-ui.min.css">
-    <link rel="stylesheet" href="assets/jquery-ui/overcast/theme.css">
-
-    <!--my scripts and styles-->
-    <script src="assets/includes/loadContent.js.php"></script>
-    <script>
-        $(function() {
-            loadContent('assets/includes/navbar_content.php', function() {
-
-            });
-        });<!--end ready-->
-    </script>
+    <?php require_once('assets/includes/common_head_contents.php'); ?>
 </head>
 <body>
+<header>
+    <div id="navbar_area"></div>
+</header>
+<section>
+    <main>
+        <article>
+            <h1>Welcome to Generic Sharer!!</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias enim
+                minima numquam quos! Accusamus aperiam aspernatur cumque deserunt minima
+                neque officia quod quos soluta totam! Corporis cumque dolorem error officiis!</p>
+        </article>
+    </main>
+</section>
 
-    <!--<div id="show_button">Show Calculator</div>-->
-    <div>
-<!--    --><?php
-//        $user = new User();
-//        $user->login('Testing Login', 'test');
-//        $user->sendVerification();
-//    ?>
-    </div>
+
 
 
 </body>

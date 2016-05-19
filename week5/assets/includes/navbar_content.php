@@ -24,11 +24,22 @@ $(function() {
         });
     }); // end login_button
     
+    $('#verify_button').on('click', function() {
+    console.log('Clicked');
+        loadContent('assets/includes/verify_confirm_content.php', function() {
+            verifyConfirm();
+        });
+    }); // end verify function 
+    
     $('#logout_button').on('click', function() {
         $.get('assets/actions/do_logout.php', function() {
             updateNavbar();
         });
     }); // end logout function 
+    
+    $(window).on('focus', function() {
+        updateNavbar();
+    });
     
     // Init the navbar 
     updateNavbar();
@@ -36,15 +47,23 @@ $(function() {
 }); // end Ready 
 function updateNavbar() {
     $.get('assets/actions/get_username.php', function(user) {
-        if (user == '') {
+        if (user.username == '') {
             $('#login_button span').removeClass('hidden');
             $('#register_button span').removeClass('hidden');
             $('#username span').text('').addClass('hidden');
+            $('#verify_button span').addClass('hidden');
             $('#logout_button span').addClass('hidden');
         } else {
             $('#login_button span').addClass('hidden');
             $('#register_button span').addClass('hidden');
-            $('#username span').text(user).removeClass('hidden');
+            $('#username span').text(user.username).removeClass('hidden');
+            
+            // check to see if the user has a default role 
+            if (user.role === 'User') {
+                $('#verify_button span').removeClass('hidden');
+            } else { 
+                $('#verify_button span').addClass('hidden');
+            }
             $('#logout_button span').removeClass('hidden');
         }
         
@@ -66,6 +85,9 @@ $html = <<<HTML
         </li>
         <li class="tool_item_right clickable" id="logout_button">
             <span class="tool_item_label hidden">Log Out</span>
+        </li>
+        <li class="tool_item_right clickable" id="verify_button">
+            <span class="tool_item_label hidden">Verify your account</span>
         </li>
         <li class="tool_item_right" id="username">
             <span class="tool_item_label hidden"></span>

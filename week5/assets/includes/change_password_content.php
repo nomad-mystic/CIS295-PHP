@@ -16,14 +16,14 @@ $register_password_confirmation_key = User::REGISTER_PASSWORD_CONFIRMATION_KEY;
 $status_error = User::STATUS_ERROR;
 
 $js = <<<JS
-function register() {
+function changePassword(username, code) {
     // clear inputs 
     $('#register_dialog input').val('');
     // clear errors 
     $('.register_error_message').html('');
     
     // activate register dialog modal 
-    $('#register_dialog').dialog({
+    $('#change_password_dialog').dialog({
         width: 600,
         model: true,
         buttons: {
@@ -45,21 +45,21 @@ function register() {
                 // + location.host 
                 + 'localhost'
                 + location.pathname.substr(0, location.pathname.lastIndexOf('/')) 
-                + '/assets/actions/do_register.php',
+                + '/assets/actions/do_reset.php',
                 $('#register_dialog input').serialize() + '&sess_id=' + sess_id,
                 function(data) {
                 console.log(data);
                     if (data.status === "{$status_error}") {
-                        $('.register_error_message').html(data.message);
+                        $('.change_password_error_message').html(data.message);
                     } else {
-                        $('#register_dialog').dialog('close');
+                        $('#change_password__dialog').dialog('close');
                         updateNavbar();
                     }
                 });
             },
             'Cancel': function() 
             {
-                $('#register_dialog').dialog('close');
+                $('#change_password_dialog').dialog('close');
             }
         }
     }); // end jQuery dialog
@@ -67,29 +67,19 @@ function register() {
 JS;
 
 $html = <<<HTML
-<div title="Please Create Your Account." id="register_dialog">
-    <div class="register_error_message"></div>
-    <p id="register_header">Please Enter Your Name, Email, and Password</p>
+<div title="Please selected your new password." id="change_password_dialog">
+    <div class="change_password_error_message"></div>
+    <p id="change_password_header">Please Enter Your Name, Email, and Password and confirm your new password:</p>
     <fieldset>
-            <!--name-->
-        <label for="{$register_username_key}">Name:</label>
-        <input type="text" name="{$register_username_key}" 
-            id="{$register_username_key}" value="">
-            
-            <!--email-->
-            <label for="{$register_email_key}">Email</label>
-        <input type="email" name="{$register_email_key}" 
-            id="{$register_email_key}" value="">
+            <!--password confirmation-->
+            <label for="{$change_password_key}">Password</label>
+        <input type="password" name="{$change_password_key}" 
+            id="{$change_password_key}" value="">
             
             <!--password confirmation-->
-            <label for="{$register_password_key}">Password</label>
-        <input type="password" name="{$register_password_key}" 
-            id="{$register_password_key}" value="">
-            
-            <!--password confirmation-->
-            <label for="{$register_password_confirmation_key}">Password Confirmation</label>
-        <input type="password" name="{$register_password_confirmation_key}" 
-            id="{$register_password_confirmation_key}" value="">
+            <label for="{$change_password_confirmation_key}">Password Confirmation</label>
+        <input type="password" name="{$change_password_confirmation_key}" 
+            id="{$change_password_confirmation_key}" value="">
     </fieldset>
 </div>
 
@@ -107,7 +97,7 @@ fieldset input {
 fieldset label {
      display: block;
 }
-#register_dialog { 
+#change_password_dialog { 
     display: none;
 }
 .ui-dialog-titlebar-close {

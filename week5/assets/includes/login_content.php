@@ -21,6 +21,16 @@ function login() {
     // clear errors 
     $('.login_error_message').html('');
     
+    // callback functions for when the user forgets their password or username
+    $('#forgot_password').on('click', function() {
+        loadContent('assets/includes/password_reset_content.php', function() {
+            passwordReset();
+        });
+    });
+    $('#forgot_username').on('click', function() {
+    
+    });
+    
     // activate login dialog modal 
     $('#login_dialog').dialog({
         width: 600,
@@ -69,6 +79,10 @@ $html = <<<HTML
 <div title="Please Log In into Your Account." id="login_dialog">
     <div class="login_error_message"></div>
     <p id="login_header">Please Enter Your Name, and Password</p>
+    <ul>
+        <li id="forgot_password"><span class="linked">Forgot your password?</span></li>
+        <li id="forgot_username"><span class="linked">Forgot your username?</li>
+    </ul>
     <fieldset>
             <!--name-->
         <label for="{$login_username_key}">Name:</label>
@@ -95,8 +109,17 @@ fieldset input {
 fieldset label {
      display: block;
 }
+#login_dialog { 
+    display: none;
+}
 .ui-dialog-titlebar-close {
      display: none;
+}
+.linked {
+    color: green;
+}
+.linked:hover {
+    cursor: pointer;
 }
 CSS;
 

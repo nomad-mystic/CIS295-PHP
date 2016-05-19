@@ -14,8 +14,18 @@ class SharerDatabase
     const DB_USER = 'sharer';
     const DB_PASSWORD = 'test';
     const DB_DATABASE = 'sharer';
-    
-    // properties 
+
+    // database table
+    const USERS_TABLE = 'users';
+    // Class columns keys for database
+    const VERIFICATION_CODE_KEY = 'VerificationCode';
+    const ROLE_KEY = 'Role';
+    const USERNAME_KEY = 'Username';
+    const HASH_KEY = 'Hash';
+    const EMAIL_KEY = 'Email';
+    const RESET_KEY = 'ResetCode';
+
+    // properties
     private static $database = null;
 
     // private functions
@@ -42,15 +52,25 @@ class SharerDatabase
             SharerDatabase::$database = null;
         }
     }
-
+    
+    // looking up user by username
     public function lookupUser($username)
     {
+        // SQL Keys
+        $verification_code = SharerDatabase::VERIFICATION_CODE_KEY;
+        $reset_code = SharerDatabase::RESET_KEY;
+        $users_table = SharerDatabase::USERS_TABLE;
         $connection = SharerDatabase::connect();
+        $username_key = SharerDatabase::USERNAME_KEY;
+        $email_key = SharerDatabase::EMAIL_KEY;
+        $hash_key = SharerDatabase::HASH_KEY;
+        $role_key = SharerDatabase::ROLE_KEY;
+
         $safe_username = $connection->real_escape_string($username);
         $query = <<<QUERY
-SELECT Username, Email, Hash, Role
-FROM users
-WHERE Username = '$safe_username';
+SELECT $username_key, $email_key, $hash_key, $role_key, $verification_code, $reset_code
+FROM $users_table
+WHERE $username_key = '$safe_username';
 QUERY;
 
         $result = $connection->query($query);
@@ -58,29 +78,71 @@ QUERY;
         return $result->fetch_array(MYSQL_ASSOC);
     } // end lookupUser method
 
-    public function addUser($username, $email, $hash)
+    public function addUser($username, $email, $hash, $role)
     {
+
         $connection = SharerDatabase::connect();
         $safe_username = $connection->real_escape_string($username);
         $safe_email = $connection->real_escape_string($email);
 
+        // SQL Keys
+        $users_table = SharerDatabase::USERS_TABLE;
+        $username_key = SharerDatabase::USERNAME_KEY;
+        $email_key = SharerDatabase::EMAIL_KEY;
+        $hash_key = SharerDatabase::HASH_KEY;
+        $role_key = SharerDatabase::ROLE_KEY;
+
         $query = <<<QUERY
-INSERT INTO users (Username, Email, Hash, Role)
-VALUES ('$safe_username', '$safe_email', '$hash', 'User');
+INSERT INTO $users_table ($username_key, $email_key, $hash_key, $role_key)
+VALUES ('$safe_username', '$safe_email', '$hash', '$role');
 QUERY;
 
         $connection->query($query);
     } // end addUser method
 
-    public function storeVerification($username, $code)
+    // private helper function
+    private function storeCode($username, $code, $column)
     {
+        // SQL Keys
+        $username_key = SharerDatabase::USERNAME_KEY;
+        $users_table = SharerDatabase::USERS_TABLE;
+
         $connection = SharerDatabase::connect();
         $safe_username = $connection->real_escape_string($username);
         $query = <<<QUERY
-UPDATE users 
-SET VerificationCode = '$code' 
-WHERE Username = '$safe_username';
+UPDATE $users_table 
+SET $column = '$code' 
+WHERE $username_key = '$safe_username';
 QUERY;
         $connection->query($query);
     } // end storeVerification
-}
+
+    public function storeVerification($username, $code)
+    {
+        $this->storeCode($username, $code, SharerDatabase::VERIFICATION_CODE_KEY);
+        // SQL Keys
+
+    } // end storeVerification
+
+    public function storeResetCode($username, $code)
+    {
+        $this->storeCode($username, $code, SharerDatabase::RESET_KEY);
+    } // end storeResetCode()
+
+    public function changeRole($username, $role)
+    {
+        // SQL Keys
+        $role_key = SharerDatabase::ROLE_KEY;
+        $username_key = SharerDatabase::USERNAME_KEY;
+        $users_table = SharerDatabase::USERS_TABLE;
+
+        $connection = SharerDatabase::connect();
+        $safe_username = $connection->real_escape_string($username);
+        $query = <<<QUERY
+UPDATE $users_table 
+SET $role_key = '$role' 
+WHERE $username_key = '$safe_username';
+QUERY;
+        $connection->query($query);
+    }
+} // end SharerDatabase

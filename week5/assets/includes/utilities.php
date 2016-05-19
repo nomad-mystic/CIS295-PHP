@@ -15,3 +15,12 @@ function get_post_value($key)
         return $_POST[$key];
     }
 }
+
+function get_get_value($key)
+{
+    if (!isset($_GET) || !isset($_GET[$key])) {
+        return '';
+    } else {
+        return $_GET[$key];
+    }
+}

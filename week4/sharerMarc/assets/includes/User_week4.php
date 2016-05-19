@@ -1,14 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Nomad_Mystic
- * Date: 5/5/2016
- * Time: 11:29 PM
- */
-
-
-
-
+///*/**
+// * Created by PhpStorm.
+// * User: Nomad_Mystic
+// * Date: 5/5/2016
+// * Time: 11:29 PM
+// */
+//
+//
+//
+//
 //class User
 //{
 //    // Class Constants

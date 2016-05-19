@@ -14,9 +14,14 @@ var loadContent = (function()
     var loaded = [];
 
     // Local Functions
-    function addHTML(html)
+    function addHTML(html, where)
     {
-        $('body').append(html);
+        if (where) {
+            $(where).append(html);
+        } else {
+            $('body').append(html);
+        }
+
     }
     function addJS(js, callback)
     {
@@ -33,7 +38,7 @@ var loadContent = (function()
             .appendTo('head');
     }
 
-    return function(path, callback)
+    return function(path, callback, where)
     {
         if (loaded.indexOf(path) > -1) {
             callback();
@@ -41,7 +46,7 @@ var loadContent = (function()
             loaded.push(path);
             $.get(path, function(data) {
                 if (data.html) {
-                    addHTML(data.html);
+                    addHTML(data.html, where);
                 }
                 if (data.css) {
                     addCSS(data.css);

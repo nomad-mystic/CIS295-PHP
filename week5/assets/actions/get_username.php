@@ -7,7 +7,13 @@
  */
 
 require_once('../includes/User.php');
+header('Content-Type: application/json');
 
 session_start();
 
-echo User::getUser();
+// Creating new class an assigning username property to the object 
+$object = new stdClass();
+$object->username = User::getUser();
+$object->role = User::getRole();
+
+echo json_encode($object);

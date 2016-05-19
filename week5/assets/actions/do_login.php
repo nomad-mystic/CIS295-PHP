@@ -8,6 +8,7 @@
 
 
 require_once('../includes/User.php');
+require_once('../includes/SharerEmail.php');
 require_once('../includes/SharerDatabase.php');
 require_once('../includes/utilities.php');
 
