@@ -9,25 +9,25 @@
 require_once('LoadableContent.php');
 require_once('User.php');
 
-$register_username_key = User::REGISTER_USERNAME_KEY;
-$register_email_key = User::REGISTER_EMAIL_KEY;
-$register_password_key = User::REGISTER_PASSWORD_KEY;
-$register_password_confirmation_key = User::REGISTER_PASSWORD_CONFIRMATION_KEY;
+$change_password_username_key = User::CHANGE_PASSWORD_USERNAME_KEY;
+$change_password_code_key = User::CHANGE_PASSWORD_CODE_KEY;
+$change_password_key = User::CHANGE_PASSWORD_KEY;
+$change_password_confirmation_key = User::CHANGE_PASSWORD_CONFIRMATION_KEY;
 $status_error = User::STATUS_ERROR;
 
 $js = <<<JS
 function changePassword(username, code) {
     // clear inputs 
-    $('#register_dialog input').val('');
+    $('#change_password_dialog input').val('');
     // clear errors 
-    $('.register_error_message').html('');
+    $('.change_password_error_message').html('');
     
     // activate register dialog modal 
     $('#change_password_dialog').dialog({
         width: 600,
         model: true,
         buttons: {
-            'Register': function() 
+            'Change Password': function() 
             {
                 var cookies = document.cookie.split('; ');
                 console.log(cookies);
@@ -35,7 +35,7 @@ function changePassword(username, code) {
                 for (var i=0; i < cookies.length; i++) { 
                     if( cookies[i].indexOf('PHPSESSID=') == 0) { 
                         sess_id = cookies[i].substr(cookies[i].indexOf('=') + 1); 
-                        console.log(sess_id);
+                        console.log(sess_id + ' Session ID');
                     } 
                 } // end cookies 
                 
@@ -45,14 +45,14 @@ function changePassword(username, code) {
                 // + location.host 
                 + 'localhost'
                 + location.pathname.substr(0, location.pathname.lastIndexOf('/')) 
-                + '/assets/actions/do_reset.php',
-                $('#register_dialog input').serialize() + '&sess_id=' + sess_id,
+                + '/assets/actions/do_change_password.php',
+                $('#change_password_dialog input').serialize() + '&sess_id=' + sess_id + '&username=' + username + '&code=' + code,
                 function(data) {
                 console.log(data);
                     if (data.status === "{$status_error}") {
                         $('.change_password_error_message').html(data.message);
                     } else {
-                        $('#change_password__dialog').dialog('close');
+                        $('#change_password_dialog').dialog('close');
                         updateNavbar();
                     }
                 });

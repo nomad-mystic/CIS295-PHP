@@ -28,9 +28,5 @@ require_once('assets/includes/common_requires.php');
         </article>
     </main>
 </section>
-
-
-
-
 </body>
 </html>

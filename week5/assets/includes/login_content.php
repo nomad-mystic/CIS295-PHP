@@ -28,8 +28,10 @@ function login() {
         });
     });
     $('#forgot_username').on('click', function() {
-    
-    });
+        loadContent('assets/includes/send_usernames_content.php', function() {
+            sendUsernames();
+        }); 
+    }); // end forgot_password
     
     // activate login dialog modal 
     $('#login_dialog').dialog({

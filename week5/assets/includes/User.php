@@ -15,6 +15,11 @@ class User
     const REGISTER_PASSWORD_KEY = 'password';
     const REGISTER_PASSWORD_CONFIRMATION_KEY = 'password_confirmation';
 
+    const CHANGE_PASSWORD_USERNAME_KEY = 'username';
+    const CHANGE_PASSWORD_CODE_KEY = 'code';
+    const CHANGE_PASSWORD_CONFIRMATION_KEY = 'password_confirmation';
+    const CHANGE_PASSWORD_KEY = 'password';
+
     // keys
     const USERNAME_KEY = 'username';
     const ROLE_KEY = 'role';
@@ -22,6 +27,7 @@ class User
     const EMAIL_KEY = 'email';
     const HASH_KEY = 'hash';
     const RESET_CODE_KEY = 'reset';
+    const SEND_USERNAME_EMAIL_KEY = 'email';
     
     const STATUS_ERROR = 'error';
     const STATUS_OK = 'ok';
@@ -48,6 +54,8 @@ class User
     const E_USERNAME_EXISTS = '<b><span style="color: red">Error: User already exists.</span></b>';
     const E_PASSWORD_INCORRECT = '<b><span style="color: red">Error: Password Do Not Match our Records.</span></b>';
     const E_NO_SUCH_USER = '<b><span style="color: red">Error: Username Do Not Match our Records.</span></b>';
+    const E_NO_RESET_CODE = '<b><span style="color: red">Error: There was no reset code supplied.</span></b>';
+    const E_RESET_CODE_INCORRECT = '<b><span style="color: red">Error: The reset code is invalid. Please check your email for the <b>latest</b> password reset link.</span></b>';
 
     const ROOT_DIRECTORY = 'http://localhost:8080/CIS295P/week5';
 
@@ -157,7 +165,6 @@ class User
         if (empty($password_confirmation)) {
             return User::getStatusObject(User::STATUS_ERROR, User::E_NO_PASSWORD_CONFIRMATION);
         }
-
         // checking to see if password match
         if ($password !== $password_confirmation) {
             return User::getStatusObject(User::STATUS_ERROR, User::E_PASSWORD_MATCH);
@@ -246,13 +253,6 @@ class User
         return $code;
     } // end generateCode
 
-//    public function testGenerateCode()
-//    {
-//        for ($j =0; $j < 100; $j++) {
-//            echo $this->generateCode(User::VERIFICATION_CODE_LENGTH) . '<hr>';
-//        }
-//    }
-
     // Send reset
     public function sendResetCode($username)
     {
@@ -335,6 +335,48 @@ BODY;
         $sharer_email->send();
     } // end sendVerification()
 
+    // Changes Password
+    public function changePassword($username, $code, $password, $password_confirmation)
+    {
+        // Checking to make user user entered all information in sign up form
+        if (empty($username)) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_NO_USERNAME);
+        }
+        if (empty($code)) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_NO_RESET_CODE);
+        }
+        if (empty($password)) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_NO_PASSWORD);
+        }
+        if (empty($password_confirmation)) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_NO_PASSWORD_CONFIRMATION);
+        }
+        // checking to see if password match
+        if ($password !== $password_confirmation) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_PASSWORD_MATCH);
+        }
+        // connecting to the database object
+        $database = new SharerDatabase();
+        $user = $database->lookupUser($username);
+        // making sure user is not defined
+        if (!$user) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_NO_SUCH_USER);
+        }
+        if ($code !== $user[SharerDatabase::RESET_KEY]) {
+            return User::getStatusObject(User::STATUS_ERROR, User::E_RESET_CODE_INCORRECT);
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $database->changePassword($username, $hash);
+
+        $this->setUser($username);
+        $this->setRole($user[SharerDatabase::ROLE_KEY]);
+        $this->setEmail($user[SharerDatabase::EMAIL_KEY]);
+        $this->setHash($hash);
+
+        return User::getStatusObject(User::STATUS_OK, '');
+    }
+    
     // verifying the account
     public function verify($username, $code)
     {
@@ -386,4 +428,48 @@ BODY;
 BODY;
         }
     } // end verify
+
+    public function sendUsernamesEmail($email)
+    {
+        // general variables
+        $sharer_url = User::ROOT_DIRECTORY;
+
+        // connecting to the database object
+        $database = new SharerDatabase();
+        $usernames = $database->lookupUsernames($email);
+
+        if (count($usernames) === 0) {
+            $body = <<<BODY
+<h1>Generic Sharer Username Lookup</h1>
+<p>The email address {$email} was used to lookup usernames on the 
+<a href="$sharer_url">Generic Sharer</a> website. There where no usernames that match your email address.</p>
+BODY;
+        } else if (count($usernames) === 1) {
+            $username = htmlentities($usernames[0][SharerDatabase::USERNAME_KEY]);
+            $body = <<<BODY
+<h1>Generic password reset</h1>
+<p>The email address {$email}was used to lookup usernames on the 
+<a href="$sharer_url">Generic Sharer</a> website. Your username is: <b>$username</b></p>
+BODY;
+        } else {
+
+            $username = htmlentities($usernames[0][SharerDatabase::USERNAME_KEY]);
+            $body = <<<BODY
+<h1>Generic password reset</h1>
+<p>The email address {$email}was used to lookup usernames on the 
+<a href="$sharer_url">Generic Sharer</a> website. The usernames associated with this account are
+<ul>
+BODY;
+            foreach ($usernames as $username) {
+                $body .= '<li>' . htmlentities($username[SharerDatabase::USERNAME_KEY]) . '</li>' . "\r\n";
+            }
+            $body .= '<ul>';
+
+        }
+
+        $subject = 'Please Generic Sharer Username';
+        $sharer_email = new SharerEmail($email, $subject, $body);
+        $sharer_email->send();
+
+    } // end lookupUsernames() method
 } // end User class

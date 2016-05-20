@@ -80,17 +80,16 @@ QUERY;
 
     public function addUser($username, $email, $hash, $role)
     {
-
-        $connection = SharerDatabase::connect();
-        $safe_username = $connection->real_escape_string($username);
-        $safe_email = $connection->real_escape_string($email);
-
         // SQL Keys
         $users_table = SharerDatabase::USERS_TABLE;
         $username_key = SharerDatabase::USERNAME_KEY;
         $email_key = SharerDatabase::EMAIL_KEY;
         $hash_key = SharerDatabase::HASH_KEY;
         $role_key = SharerDatabase::ROLE_KEY;
+
+        $connection = SharerDatabase::connect();
+        $safe_username = $connection->real_escape_string($username);
+        $safe_email = $connection->real_escape_string($email);
 
         $query = <<<QUERY
 INSERT INTO $users_table ($username_key, $email_key, $hash_key, $role_key)
@@ -100,8 +99,29 @@ QUERY;
         $connection->query($query);
     } // end addUser method
 
+    public function lookupUsernames($email)
+    {
+
+        // SQL Keys
+        $users_table = SharerDatabase::USERS_TABLE;
+        $username_key = SharerDatabase::USERNAME_KEY;
+        $email_key = SharerDatabase::EMAIL_KEY;
+
+        $connection = SharerDatabase::connect();
+        $safe_email = $connection->real_escape_string($email);
+
+        $query = <<<QUERY
+SELECT $username_key 
+FROM $users_table
+WHERE $email_key = '$safe_email';
+QUERY;
+
+        $results = $connection->query($query);
+        return $results->fetch_all(MYSQL_ASSOC);
+
+    }
     // private helper function
-    private function storeCode($username, $code, $column)
+    private function changeColumnValue($username, $value, $column)
     {
         // SQL Keys
         $username_key = SharerDatabase::USERNAME_KEY;
@@ -111,7 +131,7 @@ QUERY;
         $safe_username = $connection->real_escape_string($username);
         $query = <<<QUERY
 UPDATE $users_table 
-SET $column = '$code' 
+SET $column = '$value' 
 WHERE $username_key = '$safe_username';
 QUERY;
         $connection->query($query);
@@ -119,15 +139,22 @@ QUERY;
 
     public function storeVerification($username, $code)
     {
-        $this->storeCode($username, $code, SharerDatabase::VERIFICATION_CODE_KEY);
+        $this->changeColumnValue($username, $code, SharerDatabase::VERIFICATION_CODE_KEY);
         // SQL Keys
 
     } // end storeVerification
 
     public function storeResetCode($username, $code)
     {
-        $this->storeCode($username, $code, SharerDatabase::RESET_KEY);
+        $this->changeColumnValue($username, $code, SharerDatabase::RESET_KEY);
     } // end storeResetCode()
+
+    // for changing the users password after reset
+    public function changePassword($username, $hash)
+    {
+        $this->changeColumnValue($username, $hash, SharerDatabase::HASH_KEY);
+        $this->changeColumnValue($username, '', SharerDatabase::RESET_KEY);
+    }
 
     public function changeRole($username, $role)
     {
