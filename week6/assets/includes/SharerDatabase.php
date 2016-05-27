@@ -35,7 +35,16 @@ class SharerDatabase
     const ORIGINAL_IMAGE_ID_KEY = 'OriginalImageID';
     const PAGE_IMAGE_ID_KEY = 'PageImageID';
     const THUMBNAIL_IMAGE_ID_KEY = 'ThumbnailImageID';
-    
+
+    // Images table constants
+    const IMAGES_TABLE = 'Images';
+    const IMAGES_ID_KEY = 'ImagesID';
+    const MIME_TYPE_KEY = 'MimeType';
+    const SIZE_KEY = 'Size';
+    const WIDTH_KEY = 'Width';
+    const HEIGHT_KEY = 'Height';
+    const DATA_KEY = 'Data';
+
     // properties
     private static $database = null;
 
@@ -184,19 +193,26 @@ QUERY;
         $connection->query($query);
     } // end changeRole()
 
-    public function insertImage($type, $size, $data)
+    public function insertImage($type, $size, $width, $height, $data)
     {
+        $images_table = SharerDatabase::IMAGES_TABLE;
+        $mime_type_key = SharerDatabase::MIME_TYPE_KEY;
+        $size_key = SharerDatabase::SIZE_KEY;
+        $data_key = SharerDatabase::DATA_KEY;
+        $width_key = SharerDatabase::WIDTH_KEY;
+        $height_key = SharerDatabase::HEIGHT_KEY;
+
         $query = <<<QUERY
-INSERT INTO images(MimeType, Size, Data)
-VALUES (?, ?, ?);
+INSERT INTO {$images_table} ({$mime_type_key}, {$size_key}, {$width_key}, {$height_key}, {$data_key})
+VALUES (?, ?, ?, ?, ?);
 QUERY;
 
         $connection = SharerDatabase::connect();
         $statement = $connection->prepare($query);
-        $statement->bind_param('sib', $type, $size, $data);
+        $statement->bind_param('siiib', $type, $size, $width, $height, $data);
 
         // send a group of packets
-        $statement->send_long_data(2, $data);
+        $statement->send_long_data(4, $data);
         $statement->execute();
 
         return $connection->insert_id;

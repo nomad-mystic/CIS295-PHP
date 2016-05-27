@@ -24,7 +24,12 @@ class Image
         $type = $file[Image::FILE_TYPE];
         $data = file_get_contents($file[Image::FILE_TMP_NAME]);
 
-        $this->m_id = $database->insertImage($type, $size, $data);
+        $image = new Imagick();
+        $image->readImageBlob($data);
+        $coalesced = $image->coalesceImages();
+        $d = $coalesced->getImageGeometry();
+
+        $this->m_id = $database->insertImage($type, $size, $d['width'], $d['height'],  $data);
     }
 
     public function getId()

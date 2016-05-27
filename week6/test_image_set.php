@@ -16,7 +16,7 @@ $data = file_get_contents('assets/images/test_image_png.png');
 $image = new Imagick();
 $image->readImageBlob($data);
 
-$blob = $image_set->createPageImage($image);
+$blob = $image_set->createThumbnailImage($image);
 
 header('Content-Type: image/png');
 echo $blob;
