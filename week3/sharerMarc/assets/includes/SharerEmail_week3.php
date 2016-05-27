@@ -58,8 +58,7 @@
 //
 //    } // end send() method
 //
-//    public function getStatus()
-//    {
+//    public function getStatus() {
 //        return $this->mResults;
 //    }
 //}; // End SharerEmail
