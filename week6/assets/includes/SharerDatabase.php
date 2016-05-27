@@ -25,6 +25,17 @@ class SharerDatabase
     const EMAIL_KEY = 'Email';
     const RESET_KEY = 'ResetCode';
 
+    // Image sets database constants
+    const IMAGESETS_TABLE = 'ImageSets';
+    const IMAGE_SETS_ID_KEY = 'ImageSetID';
+    const OWNER_KEY = 'Owner';
+    const TIME_KEY = 'Time';
+    const NAME_KEY = 'Name';
+    const SHARING_KEY = 'Sharing';
+    const ORIGINAL_IMAGE_ID_KEY = 'OriginalImageID';
+    const PAGE_IMAGE_ID_KEY = 'PageImageID';
+    const THUMBNAIL_IMAGE_ID_KEY = 'ThumbnailImageID';
+    
     // properties
     private static $database = null;
 
