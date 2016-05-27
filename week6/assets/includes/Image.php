@@ -10,26 +10,12 @@
 
 class Image
 {
-    const FILE_KEY = 'file';
-    const FILE_TYPE = 'type';
-    const FILE_SIZE = 'size';
-    const FILE_TMP_NAME = 'tmp_name';
-
     private $m_id = 0;
 
-    public function __construct($file)
+    public function __construct($type, $size, $width, $height, $data)
     {
         $database = new SharerDatabase();
-        $size = $file[Image::FILE_SIZE];
-        $type = $file[Image::FILE_TYPE];
-        $data = file_get_contents($file[Image::FILE_TMP_NAME]);
-
-        $image = new Imagick();
-        $image->readImageBlob($data);
-        $coalesced = $image->coalesceImages();
-        $d = $coalesced->getImageGeometry();
-
-        $this->m_id = $database->insertImage($type, $size, $d['width'], $d['height'],  $data);
+        $this->m_id = $database->insertImage($type, $size, $width, $height,  $data);
     }
 
     public function getId()

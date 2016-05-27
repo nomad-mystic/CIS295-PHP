@@ -45,6 +45,8 @@ class SharerDatabase
     const HEIGHT_KEY = 'Height';
     const DATA_KEY = 'Data';
 
+
+
     // properties
     private static $database = null;
 
@@ -196,6 +198,7 @@ QUERY;
     public function insertImage($type, $size, $width, $height, $data)
     {
         $images_table = SharerDatabase::IMAGES_TABLE;
+
         $mime_type_key = SharerDatabase::MIME_TYPE_KEY;
         $size_key = SharerDatabase::SIZE_KEY;
         $data_key = SharerDatabase::DATA_KEY;
@@ -217,4 +220,98 @@ QUERY;
 
         return $connection->insert_id;
     }
+
+    function insertImageSet($owner, $name, $sharing, $original_id, $page_id, $thumb_id)
+    {
+        $images_set_table = SharerDatabase::IMAGESETS_TABLE;
+
+        $owner_key = SharerDatabase::OWNER_KEY;
+        $name_key = SharerDatabase::NAME_KEY;
+        $sharing_key = SharerDatabase::SHARING_KEY;
+        $original_id_key = SharerDatabase::ORIGINAL_IMAGE_ID_KEY;
+        $page_id_key = SharerDatabase::PAGE_IMAGE_ID_KEY;
+        $thumb_id_key = SharerDatabase::THUMBNAIL_IMAGE_ID_KEY;
+
+        $query = <<<QUERY
+INSERT INTO {$images_set_table} ({$owner_key}, 
+{$name_key}, 
+{$sharing_key}, 
+{$original_id_key}, 
+{$page_id_key},
+{$thumb_id_key})
+VALUES (?, ?, ?, ?, ?, ?);
+QUERY;
+
+        $connection = SharerDatabase::connect();
+        $statement = $connection->prepare($query);
+        $statement->bind_param('sssiii', 
+            $owner,
+            $name,
+            $sharing,
+            $original_id,
+            $page_id,
+            $thumb_id
+        );
+        $statement->execute();
+
+        return $connection->insert_id;
+    }
+
+    public function fetchImage($set_id, $size_type_key)
+    {
+        $connection = SharerDatabase::connect();
+
+        // table variables
+        $image_table = SharerDatabase::IMAGES_TABLE;
+        $imagesets_table = SharerDatabase::IMAGESETS_TABLE;
+        $mime_type_key = SharerDatabase::MIME_TYPE_KEY;
+        $data_key = SharerDatabase::DATA_KEY;
+        $size_key = SharerDatabase::SIZE_KEY;
+        $name_key = SharerDatabase::NAME_KEY;
+        $width_key = SharerDatabase::WIDTH_KEY;
+        $height_key = SharerDatabase::HEIGHT_KEY;
+        $image_id_key = SharerDatabase::IMAGES_ID_KEY;
+        $image_sets_id = SharerDatabase::IMAGE_SETS_ID_KEY;
+        $safe_size_type_key = $connection->real_escape_string($size_type_key);
+
+        $query = <<<QUERY
+SELECT {$mime_type_key}, 
+{$data_key}, 
+{$size_key},
+{$name_key},
+{$width_key},
+{$height_key}
+FROM {$image_table} 
+JOIN {$imagesets_table} ON {$image_id_key} = {$safe_size_type_key}
+WHERE {$image_sets_id} = ?;
+QUERY;
+        $type = null;
+        $data = null;
+        $size = null;
+        $name = null;
+        $width = null;
+        $height = null;
+
+        $statement = $connection->prepare($query);
+        $statement->bind_param('i', $set_id);
+        $statement->bind_result(
+            $type,
+            $data,
+            $size,
+            $name,
+            $width,
+            $height
+        );
+        $statement->execute();
+        $statement->fetch();
+
+        return [
+            $mime_type_key => $type,
+            $data_key => $data,
+            $size_key => $size,
+            $name_key => $name,
+            $width_key => $width,
+            $height_key => $height
+        ];
+    } // end fetchImage
 } // end SharerDatabase

@@ -9,6 +9,12 @@
 
 class ImageSet
 {
+    const FILE_KEY = 'file';
+    const FILE_TYPE = 'type';
+    const FILE_SIZE = 'size';
+    const FILE_TMP_NAME = 'tmp_name';
+    const FILE_NAME = 'name';
+
     // sharing constants
     const SHARING_PRIVATE = 'private';
     const SHARING_PUBLIC = 'public';
@@ -16,8 +22,87 @@ class ImageSet
     const PAGE_IMAGE_WIDTH = 800;
     const THUMBNAIL_SIZE = 128;
 
+    const IMAGE_SET_ID_KEY = 'id';
+    const IMAGE_SET_SIZE_KEY = 'size';
+    
+    // private variables
+    private $m_id = 0;
 
-    public function createPageImage($source_image)
+    // upload files constructor
+    public function __construct($file)
+    {
+        $size = $file[ImageSet::FILE_SIZE];
+        $type = $file[ImageSet::FILE_TYPE];
+        $data = file_get_contents($file[ImageSet::FILE_TMP_NAME]);
+        $name = $file[ImageSet::FILE_NAME];
+
+        $image = new Imagick();
+        $image->readImageBlob($data);
+
+        $coalesced = $image->coalesceImages();
+        $d = $coalesced->getImageGeometry();
+
+        $width = $d['width'];
+        $height = $d['height'];
+        $original = new Image($type, $size, $width, $height, $data);
+
+        // for creating full size image
+        $page = ImageSet::createPageImage($image);
+        $data = $page->getImageBlob();
+        $page->coalesceImages();
+        $d = $page->getImageGeometry();
+
+        $size = strlen($data);
+        $width = $d['width'];
+        $height = $d['height'];
+
+        $page_image = new Image($type, $size, $width, $height, $data);
+
+        // for creating thumbnail image
+        $thumb = ImageSet::createThumbnailImage($page);
+
+//        $page = ImageSet::createPageImage($image);
+        $data = $thumb->getImageBlob();
+        $thumb->coalesceImages();
+        $d = $thumb->getImageGeometry();
+
+        $size = strlen($data);
+        $width = $d['width'];
+        $height = $d['height'];
+
+        $thumb_image = new Image($type, $size, $width, $height, $data);
+
+        // Marc / Nomad Notes
+        // this is where my program breaks
+        // it creates three images in the database of the three different sizes
+        // and the imagesets table ID's are all the same
+        // This is the function I had before experimentation
+        /* $this->m_id = $database->insertImageSet(
+            User::getUser(),
+                $name,
+                ImageSet::SHARING_PRIVATE,
+                $original_id->getId(),
+                $original_id->getId(),
+                $original_id->getId()
+            );
+        */
+        $database = new SharerDatabase();
+        $this->m_id = $database->insertImageSet(
+            User::getUser(),
+            $name,
+            ImageSet::SHARING_PRIVATE,
+            $page_image->getId(),
+            $page_image->getId(),
+            $page_image->getId()
+        );
+    } // end __construct()
+
+    public function getID()
+    {
+        return $this->m_id;
+    }
+
+    private static function createPageImage($source_image)
     {
         $image = $source_image->coalesceImages();
         $d = $image->getImageGeometry();
@@ -28,13 +113,10 @@ class ImageSet
             $frame->setImagePage(0, 0, 0, 0);
         }
 
-        $page_blob = $image->getImageBlob();
-        $page_d = $image->getImageGeometry();
+        return $image;
+    } // end createPageImage()
 
-        return $page_blob;
-    }
-
-    public function createThumbnailImage($source_image)
+    private static function createThumbnailImage($source_image)
     {
         $image = $source_image->coalesceImages();
         $d = $image->getImageGeometry();
@@ -67,10 +149,13 @@ class ImageSet
                 $frame->setImagePage(0, 0, 0, 0);
             }
         }
-        $page_blob = $image->getImageBlob();
-        $page_d = $image->getImageGeometry();
 
-        return $page_blob;
-    }
+        return $image;
+    } // end createThumbnailImage()
 
-}
+    public static function fetchImage($set_id, $size_type_key)
+    {
+        $database = new SharerDatabase();
+        return $database->fetchImage($set_id, $size_type_key);
+    } // end fetchImage()
+} // end ImageSet class

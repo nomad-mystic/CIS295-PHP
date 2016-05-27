@@ -8,9 +8,9 @@
 
 require_once('LoadableContent.php');
 require_once('User.php');
-require_once('Image.php');
+require_once('ImageSet.php');
 
-$file_key = Image::FILE_KEY;
+$file_key = ImageSet::FILE_KEY;
 
 
 $js = <<<JS
