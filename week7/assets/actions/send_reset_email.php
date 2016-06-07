@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: Nomad_Mystic
- * Date: 5/16/2016
- * Time: 8:01 PM
+ * Date: 5/17/2016
+ * Time: 2:03 AM
  */
 
 require_once('../includes/sharer_constants.php');
@@ -15,5 +15,4 @@ require_once('../includes/utilities.php');
 session_start();
 
 $user = new User();
-//$user->sendUsernamesEmail(get_get_value(User::SEND_USERNAME_EMAIL_KEY));
-
+$user->sendResetCode(get_get_value(User::PASSWORD_RESET_USERNAME_KEY));

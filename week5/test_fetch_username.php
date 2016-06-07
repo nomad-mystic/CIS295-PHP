@@ -9,7 +9,7 @@
 require_once('assets/includes/SharerDatabase.php');
 
 $database = new SharerDatabase();
-$results = $database->lookupUsernames('keith.murphy1@pcc.edu');
+//$results = $database->lookupUsernames('keith.murphy1@pcc.edu');
 echo '<pre>';
 print_r($results);
 echo '</pre>';

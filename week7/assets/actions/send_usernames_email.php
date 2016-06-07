@@ -15,5 +15,5 @@ require_once('../includes/utilities.php');
 session_start();
 
 $user = new User();
-//$user->sendUsernamesEmail(get_get_value(User::SEND_USERNAME_EMAIL_KEY));
+$user->sendUsernamesEmail(get_get_value(User::SEND_USERNAME_EMAIL_KEY));
 
