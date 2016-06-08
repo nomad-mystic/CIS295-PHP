@@ -57,7 +57,7 @@ class User
     const E_NO_RESET_CODE = '<b><span style="color: red">Error: There was no reset code supplied.</span></b>';
     const E_RESET_CODE_INCORRECT = '<b><span style="color: red">Error: The reset code is invalid. Please check your email for the <b>latest</b> password reset link.</span></b>';
 
-    const ROOT_DIRECTORY = 'http://localhost/CIS295P/week5';
+    const ROOT_DIRECTORY = 'http://localhost:8080/CIS295P/week7';
 
     // Member variables
     private $status;

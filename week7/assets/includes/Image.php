@@ -15,10 +15,10 @@ class Image
     public function __construct($type, $size, $width, $height, $data)
     {
         $database = new SharerDatabase();
-        $this->m_id = $database->insertImage($type, $size, $width, $height,  $data);
+        $this->m_id = $database->insertImage($type, $size, $width, $height, $data);
     }
 
-    public function getId()
+    public function getID()
     {
         return $this->m_id;
     }

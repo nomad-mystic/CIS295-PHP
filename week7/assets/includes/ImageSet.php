@@ -44,7 +44,7 @@ class ImageSet
 
         $width = $d['width'];
         $height = $d['height'];
-        $original = new Image($type, $size, $width, $height, $data);
+        $original_image = new Image($type, $size, $width, $height, $data);
 
         // for creating full size image
         $page = ImageSet::createPageImage($image);
@@ -91,9 +91,9 @@ class ImageSet
             User::getUser(),
             $name,
             ImageSet::SHARING_PRIVATE,
-            $page_image->getId(),
-            $page_image->getId(),
-            $page_image->getId()
+            $original_image->getID(),
+            $page_image->getID(),
+            $thumb_image->getID()
         );
     } // end __construct()
 
