@@ -26,7 +26,7 @@ class SharerDatabase
     const RESET_KEY = 'ResetCode';
 
     // Image sets database constants
-    const IMAGESETS_TABLE = 'ImageSets';
+    const IMAGESETS_TABLE = 'imagesets';
     const IMAGE_SETS_ID_KEY = 'ImageSetID';
     const OWNER_KEY = 'Owner';
     const TIME_KEY = 'Time';
@@ -37,16 +37,14 @@ class SharerDatabase
     const THUMBNAIL_IMAGE_ID_KEY = 'ThumbnailImageID';
 
     // Images table constants
-    const IMAGES_TABLE = 'Images';
+    const IMAGES_TABLE = 'images';
     const IMAGES_ID_KEY = 'ImagesID';
     const MIME_TYPE_KEY = 'MimeType';
     const SIZE_KEY = 'Size';
     const WIDTH_KEY = 'Width';
     const HEIGHT_KEY = 'Height';
     const DATA_KEY = 'Data';
-
-
-
+    
     // properties
     private static $database = null;
 
@@ -86,7 +84,7 @@ class SharerDatabase
 
         $result = $statement->get_result();
 
-        return $result->fetch_array(MYSQL_ASSOC);
+        return $result->fetch_array(MYSQLI_ASSOC);
     } // end lookupUser method
 
     public function addUser($username, $email, $hash, $role)
@@ -107,8 +105,8 @@ class SharerDatabase
         $statement->bind_param('s', $email);
         $statement->execute();
 
-        $results = $statement->get_results();
-        return $results->fetch_all(MYSQL_ASSOC);
+        $results = $statement->get_result();
+        return $results->fetch_all(MYSQLI_ASSOC);
 
     }
     // private helper function
@@ -143,71 +141,36 @@ class SharerDatabase
 
     public function changeRole($username, $role)
     {
-        // SQL Keys
-        $role_key = SharerDatabase::ROLE_KEY;
-        $username_key = SharerDatabase::USERNAME_KEY;
-        $users_table = SharerDatabase::USERS_TABLE;
-
         $connection = SharerDatabase::connect();
-        $safe_username = $connection->real_escape_string($username);
-        $query = <<<QUERY
-UPDATE $users_table 
-SET $role_key = '$role' 
-WHERE $username_key = '$safe_username';
-QUERY;
-        $connection->query($query);
+        $query = 'CALL change_role(?, ?);';
+        $statement = $connection->prepare($query);
+        $statement->bind_param('ss', $username, $role);
+        $statement->execute();
+
     } // end changeRole()
 
     public function insertImage($type, $size, $width, $height, $data)
     {
-        $images_table = SharerDatabase::IMAGES_TABLE;
-
-        $mime_type_key = SharerDatabase::MIME_TYPE_KEY;
-        $size_key = SharerDatabase::SIZE_KEY;
-        $data_key = SharerDatabase::DATA_KEY;
-        $width_key = SharerDatabase::WIDTH_KEY;
-        $height_key = SharerDatabase::HEIGHT_KEY;
-
-        $query = <<<QUERY
-INSERT INTO {$images_table} ({$mime_type_key}, {$size_key}, {$width_key}, {$height_key}, {$data_key})
-VALUES (?, ?, ?, ?, ?);
-QUERY;
-
         $connection = SharerDatabase::connect();
+        $query = 'SELECT insert_image(?, ?, ?, ?, ?);';
         $statement = $connection->prepare($query);
         $statement->bind_param('siiib', $type, $size, $width, $height, $data);
-
-        // send a group of packets
         $statement->send_long_data(4, $data);
         $statement->execute();
 
-        return $connection->insert_id;
+        $result = $statement->get_result();
+        // Debug Says Procedure insert_image doesn't exist
+        $results_array = $result->fetch_array(MYSQLI_NUM);
+        return $results_array[0];
     }
 
     function insertImageSet($owner, $name, $sharing, $original_id, $page_id, $thumb_id)
     {
-        $images_set_table = SharerDatabase::IMAGESETS_TABLE;
-
-        $owner_key = SharerDatabase::OWNER_KEY;
-        $name_key = SharerDatabase::NAME_KEY;
-        $sharing_key = SharerDatabase::SHARING_KEY;
-        $original_id_key = SharerDatabase::ORIGINAL_IMAGE_ID_KEY;
-        $page_id_key = SharerDatabase::PAGE_IMAGE_ID_KEY;
-        $thumb_id_key = SharerDatabase::THUMBNAIL_IMAGE_ID_KEY;
-
-        $query = <<<QUERY
-INSERT INTO {$images_set_table} ({$owner_key}, 
-{$name_key}, 
-{$sharing_key}, 
-{$original_id_key}, 
-{$page_id_key},
-{$thumb_id_key})
-VALUES (?, ?, ?, ?, ?, ?);
-QUERY;
+        $query = 'SELECT insert_imageset(?, ?, ?, ?, ?, ?);';
 
         $connection = SharerDatabase::connect();
         $statement = $connection->prepare($query);
-        $statement->bind_param('sssiii', 
+        $statement->bind_param('sssiii',
             $owner,
             $name,
             $sharing,
@@ -216,65 +179,62 @@ QUERY;
             $thumb_id
         );
         $statement->execute();
-
-        return $connection->insert_id;
+        // Debug Says Procedure insert_image doesn't exist
+        $result = $statement->get_result();
+        $results_array = $result->fetch_array(MYSQLI_NUM);
+        return $results_array[0];
     }
 
     public function fetchImage($set_id, $size_type_key)
     {
+        if ($size_type_key != SharerDatabase::THUMBNAIL_IMAGE_ID_KEY
+            && $size_type_key != SharerDatabase::PAGE_IMAGE_ID_KEY
+            && $size_type_key != SharerDatabase::ORIGINAL_IMAGE_ID_KEY) {
+                return null;
+        }
+
+        $query = 'CALL fetch_image(?, ?);';
         $connection = SharerDatabase::connect();
-
-        // table variables
-        $image_table = SharerDatabase::IMAGES_TABLE;
-        $imagesets_table = SharerDatabase::IMAGESETS_TABLE;
-        $mime_type_key = SharerDatabase::MIME_TYPE_KEY;
-        $data_key = SharerDatabase::DATA_KEY;
-        $size_key = SharerDatabase::SIZE_KEY;
-        $name_key = SharerDatabase::NAME_KEY;
-        $width_key = SharerDatabase::WIDTH_KEY;
-        $height_key = SharerDatabase::HEIGHT_KEY;
-        $image_id_key = SharerDatabase::IMAGES_ID_KEY;
-        $image_sets_id = SharerDatabase::IMAGE_SETS_ID_KEY;
-        $safe_size_type_key = $connection->real_escape_string($size_type_key);
-
-        $query = <<<QUERY
-SELECT {$mime_type_key}, 
-{$data_key}, 
-{$size_key},
-{$name_key},
-{$width_key},
-{$height_key}
-FROM {$image_table} 
-JOIN {$imagesets_table} ON {$image_id_key} = {$safe_size_type_key}
-WHERE {$image_sets_id} = ?;
-QUERY;
-        $type = null;
-        $data = null;
-        $size = null;
-        $name = null;
-        $width = null;
-        $height = null;
-
         $statement = $connection->prepare($query);
-        $statement->bind_param('i', $set_id);
-        $statement->bind_result(
-            $type,
-            $data,
-            $size,
-            $name,
-            $width,
-            $height
-        );
+        $statement->bind_param('is', $set_id, $size_type_key);
         $statement->execute();
-        $statement->fetch();
 
-        return [
-            $mime_type_key => $type,
-            $data_key => $data,
-            $size_key => $size,
-            $name_key => $name,
-            $width_key => $width,
-            $height_key => $height
-        ];
+        $result = $statement->get_result();
+        $results_array = $result->fetch_array(MYSQLI_ASSOC);
+
+        return $results_array;
     } // end fetchImage
+
+    public function createImageSet(
+        $user,
+        $name,
+        $sharing,
+        $type,
+        $original_size, $original_width, $original_height, $original_data,
+        $page_size, $page_width, $page_height, $page_data,
+        $thumb_size, $thumb_width, $thumb_height, $thumb_data
+    )
+    {
+        // phpmyadmin said: #1193 - Unknown system variable 'orig_id'
+        $query = 'SELECT create_imageset(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $connection = SharerDatabase::connect();
+        $statement = $connection->prepare($query);
+        $statement->bind_param('ssssiiibiiibiiib', $user,
+            $name,
+            $sharing,
+            $type,
+            $original_size, $original_width, $original_height, $original_data,
+            $page_size, $page_width, $page_height, $page_data,
+            $thumb_size, $thumb_width, $thumb_height, $thumb_data
+        );
+        $statement->send_long_data(7, $original_data);
+        $statement->send_long_data(11, $page_data);
+        $statement->send_long_data(15, $thumb_data);
+        $statement->execute();
+
+        $result = $statement->get_result();
+        $results_array = $result->fetch_array(MYSQLI_NUM);
+
+        return $results_array;
+    }
 } // end SharerDatabase

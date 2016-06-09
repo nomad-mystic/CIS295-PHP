@@ -31,48 +31,47 @@ class ImageSet
     // upload files constructor
     public function __construct($file)
     {
-        $size = $file[ImageSet::FILE_SIZE];
         $type = $file[ImageSet::FILE_TYPE];
-        $data = file_get_contents($file[ImageSet::FILE_TMP_NAME]);
+
+        $original_size = $file[ImageSet::FILE_SIZE];
+        $original_data = file_get_contents($file[ImageSet::FILE_TMP_NAME]);
         $name = $file[ImageSet::FILE_NAME];
 
         $image = new Imagick();
-        $image->readImageBlob($data);
+        $image->readImageBlob($original_data);
 
         $coalesced = $image->coalesceImages();
         $d = $coalesced->getImageGeometry();
 
-        $width = $d['width'];
-        $height = $d['height'];
-        $original = new Image($type, $size, $width, $height, $data);
+        $original_width = $d['width'];
+        $original_height = $d['height'];
+
 
         // for creating full size image
         $page = ImageSet::createPageImage($image);
-        $data = $page->getImageBlob();
+        $page_data = $page->getImagesBlob();
         $page->coalesceImages();
         $d = $page->getImageGeometry();
 
-        $size = strlen($data);
-        $width = $d['width'];
-        $height = $d['height'];
+        $page_size = strlen($page_data);
+        $page_width = $d['width'];
+        $page_height = $d['height'];
 
-        $page_image = new Image($type, $size, $width, $height, $data);
+
 
         // for creating thumbnail image
         $thumb = ImageSet::createThumbnailImage($page);
 
 //        $page = ImageSet::createPageImage($image);
-        $data = $thumb->getImageBlob();
+        $thumb_data = $thumb->getImagesBlob();
         $thumb->coalesceImages();
         $d = $thumb->getImageGeometry();
 
-        $size = strlen($data);
-        $width = $d['width'];
-        $height = $d['height'];
+        $thumb_size = strlen($thumb_data);
+        $thumb_width = $d['width'];
+        $thumb_height = $d['height'];
 
-        $thumb_image = new Image($type, $size, $width, $height, $data);
-
-        // Marc / Nomad Notes
+        // Marc / Nomad Notes - week 6
         // this is where my program breaks
         // it creates three images in the database of the three different sizes
         // and the imagesets table ID's are all the same
@@ -86,14 +85,29 @@ class ImageSet
                 $original_id->getId()
             );
         */
+        /*--Changed in week 7--*/
+//        $original_id = new Image($type, $original_size, $original_width, $original_height, $original_data);
+//        $page_id = new Image($type, $page_size, $page_width, $page_height, $page_data);
+//        $thumb_id = new Image($type, $thumb_size, $thumb_width, $thumb_height, $thumb_data);
+//
+//        $database = new SharerDatabase();
+//        $this->m_id = $database->insertImageSet(
+//            User::getUser(),
+//            $name,
+//            ImageSet::SHARING_PRIVATE,
+//            $original_id->getID(),
+//            $page_id->getID(),
+//            $thumb_id->getID()
+//        );
+        /*---changed in week 7--*/
         $database = new SharerDatabase();
-        $this->m_id = $database->insertImageSet(
+        $database->createImageSet(
             User::getUser(),
             $name,
             ImageSet::SHARING_PRIVATE,
-            $page_image->getId(),
-            $page_image->getId(),
-            $page_image->getId()
+            $type, $original_size, $original_width, $original_height, $original_data,
+            $page_size, $page_width, $page_height, $page_data,
+            $thumb_size, $thumb_width, $thumb_height, $thumb_data
         );
     } // end __construct()
 
@@ -112,6 +126,9 @@ class ImageSet
             // positioning images at absolute 0 0 0 0
             $frame->setImagePage(0, 0, 0, 0);
         }
+
+        $page_blob = $image->getImagesBlob();
+        $page_d = $image->getImageGeometry();
 
         return $image;
     } // end createPageImage()
