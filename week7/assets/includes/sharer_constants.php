@@ -9,4 +9,4 @@
 
 
 const USERNAME_KEY = 'username';
-const ROOT_DIRECTORY = 'http://localhost/CIS295P/week7';
+const ROOT_DIRECTORY = 'http://localhost/CIS295P/';

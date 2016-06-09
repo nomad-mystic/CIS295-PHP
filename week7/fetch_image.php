@@ -15,9 +15,7 @@ $size_type_key = get_get_value(ImageSet::IMAGE_SET_SIZE_KEY);
 
 // this method is not called
 // Fatal error: Call to a member function bind_param()
-// on boolean in
-// C:\xampp\htdocs\CIS295P\week6\assets\includes\SharerDatabase.php
-// on line 286
+
 $image_array = ImageSet::fetchImage($set_id, $size_type_key);
 
 header('Content-Type: ' . $image_array[SharerDatabase::MIME_TYPE_KEY]);

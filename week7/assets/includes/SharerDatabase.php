@@ -26,7 +26,7 @@ class SharerDatabase
     const RESET_KEY = 'ResetCode';
 
     // Image sets database constants
-    const IMAGESETS_TABLE = 'ImageSets';
+    const IMAGESETS_TABLE = 'imagesets';
     const IMAGE_SETS_ID_KEY = 'ImageSetID';
     const OWNER_KEY = 'Owner';
     const TIME_KEY = 'Time';
@@ -37,16 +37,14 @@ class SharerDatabase
     const THUMBNAIL_IMAGE_ID_KEY = 'ThumbnailImageID';
 
     // Images table constants
-    const IMAGES_TABLE = 'Images';
+    const IMAGES_TABLE = 'images';
     const IMAGES_ID_KEY = 'ImagesID';
     const MIME_TYPE_KEY = 'MimeType';
     const SIZE_KEY = 'Size';
     const WIDTH_KEY = 'Width';
     const HEIGHT_KEY = 'Height';
     const DATA_KEY = 'Data';
-
-
-
+    
     // properties
     private static $database = null;
 
@@ -86,7 +84,7 @@ class SharerDatabase
 
         $result = $statement->get_result();
 
-        return $result->fetch_array(MYSQL_ASSOC);
+        return $result->fetch_array(MYSQLI_ASSOC);
     } // end lookupUser method
 
     public function addUser($username, $email, $hash, $role)
@@ -107,8 +105,8 @@ class SharerDatabase
         $statement->bind_param('s', $email);
         $statement->execute();
 
-        $results = $statement->get_results();
-        return $results->fetch_all(MYSQL_ASSOC);
+        $results = $statement->get_result();
+        return $results->fetch_all(MYSQLI_ASSOC);
 
     }
     // private helper function
@@ -154,14 +152,15 @@ class SharerDatabase
     public function insertImage($type, $size, $width, $height, $data)
     {
         $connection = SharerDatabase::connect();
-        $query = 'CALL insert_image(?, ?, ?, ?, ?);';
+        $query = 'SELECT insert_image(?, ?, ?, ?, ?);';
         $statement = $connection->prepare($query);
         $statement->bind_param('siiib', $type, $size, $width, $height, $data);
         $statement->send_long_data(4, $data);
         $statement->execute();
 
         $result = $statement->get_result();
-        $results_array = $result->mysqli_fetch_array(MYSQL_NUM);
+        // Debug Says Procedure insert_image doesn't exist
+        $results_array = $result->fetch_array(MYSQLI_NUM);
         return $results_array[0];
     }
 
@@ -180,14 +179,20 @@ class SharerDatabase
             $thumb_id
         );
         $statement->execute();
-
+        // Debug Says Procedure insert_image doesn't exist
         $result = $statement->get_result();
-        $results_array = $result->fetch_array(MYSQL_NUM);
+        $results_array = $result->fetch_array(MYSQLI_NUM);
         return $results_array[0];
     }
 
     public function fetchImage($set_id, $size_type_key)
     {
+        if ($size_type_key != SharerDatabase::THUMBNAIL_IMAGE_ID_KEY
+            && $size_type_key != SharerDatabase::PAGE_IMAGE_ID_KEY
+            && $size_type_key != SharerDatabase::ORIGINAL_IMAGE_ID_KEY) {
+                return null;
+        }
+
         $query = 'CALL fetch_image(?, ?);';
         $connection = SharerDatabase::connect();
         $statement = $connection->prepare($query);
@@ -195,8 +200,41 @@ class SharerDatabase
         $statement->execute();
 
         $result = $statement->get_result();
-        $results_array = $result->fetch_array(MYSQL_ASSOC);
+        $results_array = $result->fetch_array(MYSQLI_ASSOC);
 
         return $results_array;
     } // end fetchImage
+
+    public function createImageSet(
+        $user,
+        $name,
+        $sharing,
+        $type,
+        $original_size, $original_width, $original_height, $original_data,
+        $page_size, $page_width, $page_height, $page_data,
+        $thumb_size, $thumb_width, $thumb_height, $thumb_data
+    )
+    {
+        // phpmyadmin said: #1193 - Unknown system variable 'orig_id'
+        $query = 'SELECT create_imageset(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);';
+        $connection = SharerDatabase::connect();
+        $statement = $connection->prepare($query);
+        $statement->bind_param('ssssiiibiiibiiib', $user,
+            $name,
+            $sharing,
+            $type,
+            $original_size, $original_width, $original_height, $original_data,
+            $page_size, $page_width, $page_height, $page_data,
+            $thumb_size, $thumb_width, $thumb_height, $thumb_data
+        );
+        $statement->send_long_data(7, $original_data);
+        $statement->send_long_data(11, $page_data);
+        $statement->send_long_data(15, $thumb_data);
+        $statement->execute();
+
+        $result = $statement->get_result();
+        $results_array = $result->fetch_array(MYSQLI_NUM);
+
+        return $results_array;
+    }
 } // end SharerDatabase
