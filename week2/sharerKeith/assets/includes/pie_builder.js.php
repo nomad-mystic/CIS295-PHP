@@ -14,43 +14,35 @@ header('Content-Type: text/javascript');
 $(function() {
 	// Click event to show dialog widget and
 	// uses AJAX to call pie_chart_builder.php which echos a JSON object for Chart.js
-	var show_button = $('#show_dialog_button').button();
-	show_button.on('click', function() {
-		$("#<?php echo PIE_CHART_DIALOG; ?>").dialog({
-			width: 900,
-			model: true,
-			buttons: {
-				'Build Chart': function() {
-					if ($("#<?php echo NUMBER_OF_SLICES; ?>").val() !== 0) {
-						$.post('assets/actions/pie_chart_builder.php', $("#<?php echo CHART_INPUTS; ?>").serialize(),
-							function(data) {
-//								var parsed_chart = jQuery.parseJSON(data);
-								build_chart(data);
-							});
-                         }
-                    },
-				'Close': function() {
-					$("#<?php echo PIE_CHART_DIALOG; ?>").dialog('close');
-				}
-			}
-		});
-	}); // end show_button
+	var buildChartModalButton = $('.buildChartModalButton');
+	buildChartModalButton.on('click', function() {
+		if ($("#<?php echo NUMBER_OF_SLICES; ?>").val() !== 0) {
+			$.post('assets/actions/pie_chart_builder.php', $("#<?php echo CHART_INPUTS; ?>").serialize(),
+				function(data) {
+					build_chart(data);
+				});
+		}
+	}); // end buildChartModalbutton
 
 	var build_chart = (function(chart_data)
 	{
+		console.log(chart_data);
 		var i;
 		var data = [];
 
 		// Counter Closure
-		var add = (function() 
+		var stateCounter = (function()
 		{
-			var counter = 0;
-			return function()
-			{
-				return counter += 1
+			var state = 0;
+			return {
+				add: function() {
+					state++;
+				},
+				getState: function() {
+					return state;
+				}
 			};
-		});
-		var counter = add();
+		})();
 
 		// Building Chart slice objects
 		for (i = 0; i < chart_data.number_of_slices; i++) {
@@ -68,10 +60,14 @@ $(function() {
 		var ctx = canvas.get(0).getContext('2d');
 
 		if (ctx) {
-			// First instance of the Chart object
-			var chart = new Chart(ctx).Doughnut(data);
+			if (state === undefined) {
+				// First instance of the Chart object
+				var chart = new Chart(ctx).Doughnut(data);
+				stateCounter.add();
+				var state = stateCounter.getState();
+			}
 			// If chart is initialized once then destroy and create new one
-			if (counter >= 1) {
+			if (state >= 1) {
 				chart.destroy();
 				new Chart(ctx).Doughnut(data);
 			}

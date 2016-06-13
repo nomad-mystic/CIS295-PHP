@@ -19,6 +19,9 @@ fieldset input {
 legend {
 	margin-bottom: 0;
 }
+.label {
+	color: #34495E;
+}
 .form-control {
 	margin-bottom: 0;
 	height: 30px;
@@ -33,8 +36,11 @@ legend {
 .chart_title {
 	text-align: center;
 }
+#introductionToProjectSection {
+	text-align: center;
+}
 #pie_chart_dialog {
-     display: none;
+/*     display: none;*/
 }
 
 .ui-dialog-titlebar-close {
@@ -42,5 +48,5 @@ legend {
 }
 
 #chart_inputs {
-     float: left;
+/*     float: left;*/
 }
